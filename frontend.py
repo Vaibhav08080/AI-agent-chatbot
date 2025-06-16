@@ -103,7 +103,7 @@ try:
 except ImportError:
     pass
 
-API_URL = os.getenv("RENDER_BACKEND_URL", "http://127.0.0.1:8000/chat")
+API_URL = os.getenv("RENDER_BACKEND_URL", "https://ai-agent-chatbot-8f5k.onrender.com/chat")
 
 if send and user_query.strip():
     import requests
