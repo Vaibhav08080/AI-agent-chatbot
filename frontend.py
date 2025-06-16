@@ -96,9 +96,17 @@ with send_col:
     send = st.button("🚀 Ask Agent!", use_container_width=True)
 
 # --- Show chat bubbles ---
+import os
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+API_URL = os.getenv("RENDER_BACKEND_URL", "http://127.0.0.1:8000/chat")
+
 if send and user_query.strip():
     import requests
-    API_URL = "http://127.0.0.1:8000/chat"
     payload = {
         "model_name": selected_model,
         "model_provider": provider,
@@ -108,6 +116,27 @@ if send and user_query.strip():
     }
     try:
         response = requests.post(API_URL, json=payload)
+        if response.status_code == 200:
+            response_data = response.json()
+            if "error" in response_data:
+                st.error(response_data["error"])
+            else:
+                user_bubble = f"<div class='chat-bubble-user'>🧑‍💻 {user_query}</div>"
+                if isinstance(response_data, str):
+                    ai_text = response_data
+                elif isinstance(response_data, dict):
+                    ai_text = response_data.get("response") or response_data.get("result") or str(response_data)
+                else:
+                    ai_text = str(response_data)
+                agent_bubble = f"<div class='chat-bubble-agent'>🤖 {ai_text}</div>"
+                st.markdown(user_bubble, unsafe_allow_html=True)
+                st.markdown(agent_bubble, unsafe_allow_html=True)
+                st.markdown("<hr style='margin:1.5em 0;' />", unsafe_allow_html=True)
+                st.markdown("<div style='color:#888; font-size:0.95em;'>Final Response above ⬆️</div>", unsafe_allow_html=True)
+        else:
+            st.error(f"Backend error: {response.status_code}")
+    except Exception as e:
+        st.error(f"Failed to connect to backend: {e}")
         if response.status_code == 200:
             response_data = response.json()
             if "error" in response_data:

@@ -1,0 +1,11 @@
+# Generated for Render.com deployment
+fastapi
+uvicorn
+pydantic
+langchain_groq
+langchain_openai
+langchain_community
+langchain_tavily
+streamlit
+requests
+python-dotenv
